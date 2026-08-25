@@ -1,5 +1,6 @@
 class QuotesController < ApplicationController
   before_action :set_quote, only: %i[show edit update destroy publish archive]
+  before_action :ensure_draft_quote, only: :destroy
 
   def index
     @quotes = Quote.where(status: %i[draft published]).order(updated_at: :desc)
@@ -35,7 +36,11 @@ class QuotesController < ApplicationController
 
   def destroy
     @quote.destroy!
-    redirect_to quotes_path, notice: "Quote was successfully destroyed.", status: :see_other
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@quote) }
+      format.html { redirect_to quotes_path, notice: "Quote was successfully destroyed.", status: :see_other }
+    end
   end
 
   def publish
@@ -54,6 +59,12 @@ class QuotesController < ApplicationController
 
   def quote_params
     params.expect(quote: %i[name identifier])
+  end
+
+  def ensure_draft_quote
+    return if @quote.status_draft?
+
+    render plain: "Only draft quotes can be deleted.", status: :unprocessable_entity
   end
 
   def update_status(status, notice)
