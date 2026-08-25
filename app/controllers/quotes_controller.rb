@@ -1,4 +1,6 @@
 class QuotesController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound, with: :render_quote_not_found
+
   before_action :set_quote, only: %i[show edit update destroy publish archive]
   before_action :ensure_published_quote, only: :show
   before_action :ensure_draft_quote, only: :destroy
@@ -75,7 +77,11 @@ class QuotesController < ApplicationController
   end
 
   def ensure_published_quote
-    head :not_found unless @quote.status_published?
+    raise ActiveRecord::RecordNotFound unless @quote.status_published?
+  end
+
+  def render_quote_not_found
+    render :not_found, status: :not_found
   end
 
   def update_status(status, notice)
