@@ -1,6 +1,11 @@
 class QuoteItem < ApplicationRecord
   belongs_to :quote
 
+  validates :name, presence: true, length: { maximum: 100 }
+  validates :quantity, numericality: { only_integer: true, greater_than: 0 }
+  validates :unit_price, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :vat, inclusion: { in: ApplicationHelper::VAT_RATES + [ 0 ] }
+
   def unit_price_vat
     ratio =  vat.to_f / 100
     (unit_price * ratio).to_i

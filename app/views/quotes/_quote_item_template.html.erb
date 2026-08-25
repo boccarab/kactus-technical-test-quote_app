@@ -1,0 +1,24 @@
+<template data-quote-editor-target="rowTemplate">
+  <div class="table-row h-16" role="row" data-quote-editor-target="row">
+    <div class="table-cell px-5 py-3 font-semibold" role="cell" data-field="name"></div>
+    <div class="table-cell px-3 py-3" role="cell" data-field="quantity"></div>
+    <div class="table-cell px-3 py-3" role="cell" data-field="unit-price"></div>
+    <div class="table-cell px-3 py-3" role="cell" data-field="vat"></div>
+    <div class="table-cell px-3 py-3 text-right font-semibold" role="cell" data-field="total-vat"></div>
+    <div class="table-cell px-3 py-3 text-right font-semibold" role="cell" data-field="total-ttc"></div>
+    <div class="table-cell px-3 py-3" role="cell">
+      <div class="flex justify-end gap-2">
+        <button type="button" data-action="quote-editor#edit" data-quote-editor-target="editButton" class="inline-flex size-9 items-center justify-center rounded-md border border-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" aria-label="Éditer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-current">
+            <path d="M16.86 3.49a2.09 2.09 0 0 1 2.95 0l.7.7a2.09 2.09 0 0 1 0 2.95L8.18 19.47l-4.45.8.8-4.45L16.86 3.49Zm1.47 1.47L6.37 16.92l-.23 1.29 1.29-.23L19.39 6.02a.5.5 0 0 0 0-.71l-.35-.35a.5.5 0 0 0-.71 0Z"/>
+          </svg>
+        </button>
+        <button type="button" data-action="quote-editor#remove" data-quote-editor-target="deleteButton" class="inline-flex size-9 items-center justify-center rounded-md border border-danger text-danger transition hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger" aria-label="Supprimer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

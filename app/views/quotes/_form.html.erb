@@ -1,0 +1,85 @@
+<% content_for :title, quote.persisted? ? "Modifier #{quote.name}" : "Nouveau devis" %>
+<% quote_items = quote.quote_items.reject(&:marked_for_destruction?) %>
+
+<main class="min-h-screen bg-white px-5 py-8 text-primary sm:px-8 lg:px-16 lg:py-7">
+  <%= form_with model: quote, class: "mx-auto w-full max-w-6xl", data: { controller: "quote-editor", action: "submit->quote-editor#submit", quote_editor_warning_value: "Les dernières modifications de ce devis n’ont enregistrées. Elles seront perdues si vous quittez la page. Continuer ?" } do |form| %>
+    <%= form.button class: "inline-flex items-center gap-3 rounded-md border border-primary px-7 py-3.5 font-semibold transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" do %>
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+      Enregistrer et quitter
+    <% end %>
+
+    <% if quote.errors.any? %>
+      <div class="mt-6 rounded-md border border-danger bg-orange-50 px-4 py-3 text-danger" role="alert"><%= quote.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <div class="mt-8 flex flex-wrap items-center gap-3 sm:mt-10">
+      <%= form.text_field :name, value: quote.name, maxlength: 255, aria: { label: "Nom du devis" }, class: "min-w-0 max-w-xl border-0 border-b-2 border-transparent bg-transparent px-0 text-3xl font-bold tracking-tight placeholder:text-[#8478A7] hover:border-[#DCD4EF] focus:border-primary focus:outline-none sm:text-4xl", placeholder: "Nom du devis", data: { action: "input->quote-editor#markDirty" } %>
+      <span class="rounded bg-[#E9E1FF] px-4 py-2 text-xl font-bold text-[#9977F7] sm:text-2xl">En cours d’édition</span>
+    </div>
+
+    <div class="mt-8 overflow-x-auto">
+      <div class="table w-full min-w-5xl table-fixed border-collapse text-left text-sm" role="table">
+        <div class="table-header-group bg-[#F8F4FF] text-[#8478A7]" role="rowgroup">
+          <div class="table-row" role="row">
+            <div class="table-cell px-5 py-3 font-semibold" role="columnheader">Article</div>
+            <div class="table-cell w-20 px-3 py-3 font-semibold" role="columnheader">Qté</div>
+            <div class="table-cell w-28 px-3 py-3 font-semibold" role="columnheader">PU HT</div>
+            <div class="table-cell w-20 px-3 py-3 font-semibold" role="columnheader">TVA</div>
+            <div class="table-cell w-28 px-3 py-3 text-right font-semibold" role="columnheader">Total TVA</div>
+            <div class="table-cell w-28 px-3 py-3 text-right font-semibold" role="columnheader">Total TTC</div>
+            <div class="table-cell w-24 px-3 py-3 text-right font-semibold" role="columnheader">Actions</div>
+          </div>
+        </div>
+        <div class="table-row-group" role="rowgroup" data-quote-editor-target="items">
+          <%= render "quote_item_template" %>
+          <% quote_items.each_with_index do |item, index| %>
+            <div class="table-row h-16" role="row" data-quote-editor-target="row" data-index="<%= index %>" data-name="<%= item.name %>" data-quantity="<%= item.quantity %>" data-unit-price="<%= item.unit_price %>" data-vat="<%= item.vat.to_f %>">
+              <div class="table-cell px-5 py-3 font-semibold" role="cell" data-field="name"><%= item.name %></div>
+              <div class="table-cell px-3 py-3" role="cell" data-field="quantity"><%= item.quantity %></div>
+              <div class="table-cell px-3 py-3" role="cell" data-field="unit-price"><%= format_money(item.unit_price) %></div>
+              <div class="table-cell px-3 py-3" role="cell" data-field="vat"><%= item.vat %></div>
+              <div class="table-cell px-3 py-3 text-right font-semibold" role="cell" data-field="total-vat"><%= format_money(item.total_vat) %></div>
+              <div class="table-cell px-3 py-3 text-right font-semibold" role="cell" data-field="total-ttc"><%= format_money(item.total_including_vat) %></div>
+              
+              <div class="table-cell px-3 py-3" role="cell"><div class="flex justify-end gap-2">
+                <button type="button" data-action="quote-editor#edit" data-quote-editor-target="editButton" class="inline-flex size-9 items-center justify-center rounded-md border border-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" aria-label="Éditer <%= item.name %>">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-current">
+                    <path d="M16.86 3.49a2.09 2.09 0 0 1 2.95 0l.7.7a2.09 2.09 0 0 1 0 2.95L8.18 19.47l-4.45.8.8-4.45L16.86 3.49Zm1.47 1.47L6.37 16.92l-.23 1.29 1.29-.23L19.39 6.02a.5.5 0 0 0 0-.71l-.35-.35a.5.5 0 0 0-.71 0Z"/>
+                  </svg>
+                </button>
+                <button type="button" data-action="quote-editor#remove" data-quote-editor-target="deleteButton" class="inline-flex size-9 items-center justify-center rounded-md border border-danger text-danger transition hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger" aria-label="Supprimer <%= item.name %>">                      
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/>
+                  </svg>
+                </button>
+              </div>
+                <%= hidden_field_tag "quote[quote_items_attributes][#{index}][id]", item.id, data: { attribute: "id" } if item.persisted? %>
+                <%= hidden_field_tag "quote[quote_items_attributes][#{index}][name]", item.name, data: { attribute: "name" } %><%= hidden_field_tag "quote[quote_items_attributes][#{index}][quantity]", item.quantity, data: { attribute: "quantity" } %><%= hidden_field_tag "quote[quote_items_attributes][#{index}][unit_price]", item.unit_price, data: { attribute: "unit_price" } %><%= hidden_field_tag "quote[quote_items_attributes][#{index}][vat]", item.vat, data: { attribute: "vat" } %><%= hidden_field_tag "quote[quote_items_attributes][#{index}][_destroy]", "0", data: { attribute: "destroy" } %>
+              </div>
+            </div>
+          <% end %>
+          <div class="<%= quote_items.any? ?  "hidden" : "table-row" %> bg-white shadow-[0_2px_12px_rgba(32,21,66,0.12)]" role="row" data-quote-editor-target="editor">
+            <div class="table-cell px-2 py-3" role="cell"><input data-quote-editor-target="itemName" maxlength="100" required placeholder="Titre de l’article" class="w-full rounded-md border border-[#B9ACE0] px-3 py-2 focus:outline-primary"></div>
+            <div class="table-cell px-1 py-3" role="cell"><input data-quote-editor-target="quantity" type="number" min="1" step="1" required placeholder="Qté" class="w-full rounded-md border border-[#B9ACE0] px-2 py-2 focus:outline-primary"></div>
+            <div class="table-cell px-1 py-3" role="cell"><div class="relative"><input data-quote-editor-target="unitPrice" type="number" min="0" step="0.01" required placeholder="Montant" class="w-full rounded-md border border-[#B9ACE0] py-2 pl-2 pr-6 focus:outline-primary"><span class="absolute right-2 top-2 text-[#8478A7]">€</span></div></div>
+            <div class="table-cell px-1 py-3" role="cell"><select data-quote-editor-target="vat" class="w-full rounded-md border border-[#B9ACE0] px-2 py-2 focus:outline-primary"><% ApplicationHelper::VAT_RATES.each do |rate| %><option value="<%= rate %>"><%= number_to_percentage(rate, precision: rate.to_i == rate ? 0 : 1, separator: ",") %></option><% end %></select></div>
+            <div class="table-cell px-3 py-3 text-right font-semibold" role="cell" data-quote-editor-target="previewVat">—</div><div class="table-cell px-3 py-3 text-right font-semibold" role="cell" data-quote-editor-target="previewTtc">—</div>
+            <div class="table-cell px-3 py-3" role="cell">
+              <div class="flex justify-end gap-2">
+                <button type="button" data-action="quote-editor#saveItem" class="inline-flex size-9 items-center justify-center rounded-md border border-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" aria-label="Valider">✓</button><button type="button" data-action="quote-editor#cancel" class="inline-flex size-9 items-center justify-center rounded-md border border-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" aria-label="Annuler">×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex min-h-24 items-center justify-center border border-dashed border-[#B9ACE0] px-5 py-5">
+      <button type="button" data-action="quote-editor#add" data-quote-editor-target="addButton" class="inline-flex items-center gap-3 rounded-md border border-primary px-7 py-4 font-semibold transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"><span class="text-2xl">+</span> Ajouter un article</button>
+    </div>
+
+    <div class="mt-7 flex justify-end"><dl class="w-full max-w-xs rounded-md border border-[#EEEAF5] px-5 py-4 shadow-[0_2px_12px_rgba(32,21,66,0.12)]">
+      <div class="flex justify-between"><dt>Total HT</dt><dd class="font-semibold" data-quote-editor-target="totalHt"></dd></div><div class="mt-1 flex justify-between text-[#8478A7]"><dt>Total TVA</dt><dd class="font-semibold" data-quote-editor-target="totalVat"></dd></div><div class="mt-1 flex justify-between font-bold"><dt>Total TTC</dt><dd data-quote-editor-target="totalTtc"></dd></div>
+    </dl></div>
+  <% end %>
+</main>

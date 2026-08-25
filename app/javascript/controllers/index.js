@@ -9,3 +9,6 @@ application.register("confirmation", ConfirmationController)
 
 import ToasterController from "./toaster_controller"
 application.register("toaster", ToasterController)
+
+import QuoteEditorController from "./quote_editor_controller"
+application.register("quote-editor", QuoteEditorController)

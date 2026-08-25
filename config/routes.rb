@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
   root "quotes#index"
 
-  resources :quotes do
+  get "new", to: "quotes#new", as: :new_quote
+  get "edit/:id", to: "quotes#edit", as: :edit_quote
+
+  resources :quotes, except: %i[new edit] do
     member do
       patch :publish
       patch :archive
