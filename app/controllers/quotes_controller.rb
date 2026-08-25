@@ -1,5 +1,6 @@
 class QuotesController < ApplicationController
   before_action :set_quote, only: %i[show edit update destroy publish archive]
+  before_action :ensure_published_quote, only: :show
   before_action :ensure_draft_quote, only: :destroy
 
   def index
@@ -71,6 +72,10 @@ class QuotesController < ApplicationController
     return if @quote.status_draft?
 
     render plain: "Only draft quotes can be deleted.", status: :unprocessable_entity
+  end
+
+  def ensure_published_quote
+    head :not_found unless @quote.status_published?
   end
 
   def update_status(status, notice)

@@ -12,6 +12,18 @@ class Quote < ApplicationRecord
         self[:name].presence || "sans titre"
     end
 
+    def total_excluding_vat
+        quote_items.sum(&:total_excluding_vat)
+    end
+
+    def total_vat
+        quote_items.sum(&:total_vat)
+    end
+
+    def total_including_vat
+        total_excluding_vat + total_vat
+    end
+
     private
 
     def generate_identifier
