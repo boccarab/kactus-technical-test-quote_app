@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_25_081109) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_25_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,7 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_081109) do
     t.uuid "quote_id", null: false
     t.integer "unit_price", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.integer "vat", default: 0, null: false
+    t.decimal "vat", precision: 4, scale: 1, default: "0.0", null: false
     t.index ["quote_id"], name: "index_quote_items_on_quote_id"
   end
 

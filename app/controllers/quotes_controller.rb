@@ -3,7 +3,7 @@ class QuotesController < ApplicationController
 
   before_action :set_quote, only: %i[show edit update destroy publish archive]
   before_action :ensure_published_quote, only: :show
-  before_action :ensure_draft_quote, only: :destroy
+  before_action :ensure_draft_quote, only: %i[edit update destroy]
 
   def index
     @quotes = Quote.where(status: %i[draft published]).order(updated_at: :desc)
@@ -23,7 +23,7 @@ class QuotesController < ApplicationController
     @quote = Quote.new(quote_params)
 
     if @quote.save
-      redirect_to @quote, notice: "Quote was successfully created."
+      redirect_to quotes_path, notice: "Le devis a été créé."
     else
       render :new, status: :unprocessable_entity
     end
@@ -31,7 +31,7 @@ class QuotesController < ApplicationController
 
   def update
     if @quote.update(quote_params)
-      redirect_to @quote, notice: "Quote was successfully updated."
+      redirect_to quotes_path, notice: "Le devis a été mis à jour."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -67,7 +67,7 @@ class QuotesController < ApplicationController
   end
 
   def quote_params
-    params.expect(quote: %i[name identifier])
+    params.require(:quote).permit(:name, quote_items_attributes: %i[id name quantity unit_price vat _destroy])
   end
 
   def ensure_draft_quote
