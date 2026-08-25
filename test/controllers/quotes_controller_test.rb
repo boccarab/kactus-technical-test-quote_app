@@ -23,8 +23,34 @@ class QuotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "table", count: 0
     assert_select "body", text: /Devis archivé/, count: 0
     assert_select "a[href='#{edit_quote_path(older_draft)}']"
-    assert_select "form[action='#{quote_path(older_draft)}']"
+    assert_select "form[action='#{quote_path(older_draft)}'][data-controller='confirmation'][data-action='submit->confirmation#confirm']"
     assert_select "a[href='#{quote_path(published)}']"
     assert_select "a[href='#{new_quote_path}']", text: /Ajouter un devis/
+  end
+
+  test "destroys a draft quote and returns a turbo stream removing its row" do
+    quote = Quote.create!(identifier: "DEV-DELETE", name: "À supprimer", status: :draft)
+
+    assert_difference("Quote.count", -1) do
+      delete quote_path(quote), headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_select "turbo-stream[action='remove'][target='quote_#{quote.id}']"
+  end
+
+  test "does not destroy a quote that is not a draft" do
+    %i[published archived].each do |status|
+      quote = Quote.create!(identifier: "DEV-#{status}", name: "Non supprimable", status: status)
+
+      assert_no_difference("Quote.count") do
+        delete quote_path(quote), headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      end
+
+      assert_response :unprocessable_entity
+      assert_equal "Only draft quotes can be deleted.", response.body
+      assert Quote.exists?(quote.id)
+    end
   end
 end
