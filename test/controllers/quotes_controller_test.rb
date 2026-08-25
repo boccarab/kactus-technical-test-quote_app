@@ -24,6 +24,16 @@ class QuotesControllerTest < ActionDispatch::IntegrationTest
     get quote_path(quote)
 
     assert_response :not_found
+    assert_select "h1", "Devis introuvable"
+    assert_select "a[href='#{quotes_path}']", text: /Retour à mes devis/
+  end
+
+  test "shows the quote not found page when the quote does not exist" do
+    get quote_path("00000000-0000-0000-0000-000000000000")
+
+    assert_response :not_found
+    assert_select "h1", "Devis introuvable"
+    assert_select "a[href='#{quotes_path}']", text: /Retour à mes devis/
   end
 
   test "lists draft and published quotes with the most recently edited first" do
