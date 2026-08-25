@@ -15,20 +15,22 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  # For details on connection pooling, see Rails configuration guide
-  # https://guides.rubyonrails.org/configuring.html#database-pooling
-  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("DATABASE_PORT") { 5432 } %>
+  username: <%= ENV.fetch("DATABASE_USERNAME") { "postgres" } %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD") { "postgres" } %>
 
 
 development:
   <<: *default
-  database: kactus_quote_app2_development
+  database: kactus_quote_app_development
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
   # the same name as the operating system user running Rails.
-  #username: kactus_quote_app2
+  #username: kactus_quote_app
 
   # The password associated with the PostgreSQL role (username).
   #password:
@@ -56,7 +58,10 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: kactus_quote_app2_test
+  database: kactus_quote_app_test
+  username: postgres
+  password: postgres
+  host: localhost
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -87,18 +92,18 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: kactus_quote_app2_production
-    username: kactus_quote_app2
-    password: <%= ENV["KACTUS_QUOTE_APP2_DATABASE_PASSWORD"] %>
+    database: kactus_quote_app_production
+    username: kactus_quote_app
+    password: <%= ENV["kactus_quote_app_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
-    database: kactus_quote_app2_production_cache
+    database: kactus_quote_app_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: kactus_quote_app2_production_queue
+    database: kactus_quote_app_production_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: kactus_quote_app2_production_cable
+    database: kactus_quote_app_production_cable
     migrations_paths: db/cable_migrate
