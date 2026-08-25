@@ -24,6 +24,10 @@
   </head>
 
   <body>
+    <div id="toaster" class="pointer-events-none fixed inset-x-4 top-4 z-50 ml-auto flex max-w-sm flex-col gap-3 sm:inset-x-auto sm:right-6 sm:top-6" aria-live="polite" aria-atomic="true">
+      <%= render "shared/toaster" %>
+    </div>
+
     <%= yield %>
   </body>
 </html>
