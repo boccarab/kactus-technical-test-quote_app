@@ -13,11 +13,13 @@ class QuotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "template[data-quote-editor-target='rowTemplate']", count: 1
     assert_select "div.table-row[data-quote-editor-target='editor']:not(.hidden)", count: 1
     assert_select "table", count: 0
+    assert_select "button[name='quote[status]'][value='published']", text: /Valider le devis/
 
     get edit_quote_path(quote)
     assert_response :success
     assert_select "input[name='quote[name]'][value='À modifier']"
     assert_select "button", text: /Enregistrer et quitter/
+    assert_select "button[name='quote[status]'][value='published']", text: /Valider le devis/
     assert_select "div[data-quote-editor-target='editor'].hidden", count: 1
   end
 
@@ -31,6 +33,13 @@ class QuotesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 5.5, Quote.last.quote_items.first.vat
   end
 
+  test "validates a new quote when the published status is submitted" do
+    post quotes_path, params: { quote: { name: "Devis validé", status: "published", quote_items_attributes: { "0" => { name: "Conseil", quantity: 1, unit_price: 10_000, vat: 20 } } } }
+
+    assert_redirected_to quotes_path
+    assert_predicate Quote.last, :status_published?
+  end
+
   test "updates and removes items only when the quote is submitted" do
     quote = Quote.create!(identifier: "DEV-UPDATE", name: "Avant")
     removed_item = quote.quote_items.create!(name: "Ancien", quantity: 1, unit_price: 1_000, vat: 20)
@@ -40,6 +49,15 @@ class QuotesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to quotes_path
     assert_equal "Après", quote.reload.name
     assert_equal [ "Nouveau" ], quote.quote_items.pluck(:name)
+  end
+
+  test "validates an edited quote when the published status is submitted" do
+    quote = Quote.create!(identifier: "DEV-VALIDATE", name: "À valider")
+
+    patch quote_path(quote), params: { quote: { status: "published" } }
+
+    assert_redirected_to quotes_path
+    assert_predicate quote.reload, :status_published?
   end
 
   test "shows a published quote in read-only mode with its items and totals" do

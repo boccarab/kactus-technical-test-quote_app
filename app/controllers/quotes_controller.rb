@@ -67,7 +67,7 @@ class QuotesController < ApplicationController
   end
 
   def quote_params
-    params.require(:quote).permit(:name, quote_items_attributes: %i[id name quantity unit_price vat _destroy])
+    params.require(:quote).permit(:name, :status, quote_items_attributes: %i[id name quantity unit_price vat _destroy])
   end
 
   def ensure_draft_quote
