@@ -1,0 +1,62 @@
+<% content_for :title, "Mes devis" %>
+
+<main class="min-h-screen bg-white px-5 py-10 text-primary sm:px-8 lg:px-16 lg:py-14">
+  <div class="mx-auto w-full max-w-6xl">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Mes devis</h1>
+
+    <div class="mt-10 overflow-x-auto sm:mt-12">
+      <div role="table" class="table w-full min-w-2xl table-fixed border-collapse text-left text-sm">
+        <div role="rowgroup" class="table-header-group bg-[#F8F4FF] text-[#8478A7]">
+          <div role="row" class="table-row">
+            <div role="columnheader" class="table-cell w-1/5 px-5 py-3 font-semibold">Identifiant devis</div>
+            <div role="columnheader" class="table-cell w-1/5 px-5 py-3 font-semibold">Date d’édition</div>
+            <div role="columnheader" class="table-cell px-5 py-3 font-semibold">Titre</div>
+            <div role="columnheader" class="table-cell w-32 px-5 py-3 text-right font-semibold">Actions</div>
+          </div>
+        </div>
+        <div role="rowgroup" class="table-row-group">
+          <% @quotes.each do |quote| %>
+            <div id="<%= dom_id(quote) %>" role="row" class="table-row h-20 border-b border-[#EEEAF5] last:border-b-0">
+              <div role="cell" class="table-cell px-5 py-4 align-middle font-medium"><%= quote.identifier %></div>
+              <div role="cell" class="table-cell px-5 py-4 align-middle"><%= quote.updated_at.strftime("%d/%m/%Y") %></div>
+              <div role="cell" class="table-cell truncate px-5 py-4 align-middle font-semibold"><%= quote.name %></div>
+              <div role="cell" class="table-cell px-5 py-4 align-middle">
+                <div class="flex items-center justify-end gap-2">
+                  <% if quote.status_draft? %>
+                    <%= link_to edit_quote_path(quote), class: "inline-flex size-9 items-center justify-center rounded-md border border-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary", aria: { label: "Éditer #{quote.identifier}" }, title: "Éditer" do %>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-current">
+                        <path d="M16.86 3.49a2.09 2.09 0 0 1 2.95 0l.7.7a2.09 2.09 0 0 1 0 2.95L8.18 19.47l-4.45.8.8-4.45L16.86 3.49Zm1.47 1.47L6.37 16.92l-.23 1.29 1.29-.23L19.39 6.02a.5.5 0 0 0 0-.71l-.35-.35a.5.5 0 0 0-.71 0Z"/>
+                      </svg>
+                    <% end %>
+                    <%= button_to quote_path(quote), method: :delete, class: "inline-flex size-9 items-center justify-center rounded-md border border-danger text-danger transition hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger", form: { data: { turbo_confirm: "Supprimer le devis #{quote.identifier} ?" } }, aria: { label: "Supprimer #{quote.identifier}" }, title: "Supprimer" do %>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/>
+                      </svg>
+                    <% end %>
+                  <% else %>
+                    <%= link_to quote_path(quote), class: "inline-flex h-9 w-20 items-center justify-center rounded-md border border-primary transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary", aria: { label: "Voir #{quote.identifier}" }, title: "Voir" do %>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>
+                      </svg>
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <% if @quotes.empty? %>
+      <p class="border-x border-[#EEEAF5] py-12 text-center text-[#8478A7]">Aucun devis pour le moment.</p>
+    <% end %>
+
+    <div class="flex min-h-24 items-center justify-center border border-dashed border-[#B9ACE0] px-5 py-5">
+      <%= link_to new_quote_path, class: "inline-flex items-center gap-3 rounded-md border border-primary px-7 py-4 font-semibold transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" do %>
+        <span aria-hidden="true" class="text-2xl leading-none">+</span>
+        Ajouter un devis
+      <% end %>
+    </div>
+  </div>
+</main>

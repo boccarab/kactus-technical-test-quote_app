@@ -2,7 +2,7 @@ class QuotesController < ApplicationController
   before_action :set_quote, only: %i[show edit update destroy publish archive]
 
   def index
-    @quotes = Quote.all
+    @quotes = Quote.where(status: %i[draft published]).order(updated_at: :desc)
   end
 
   def show
