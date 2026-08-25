@@ -42,22 +42,22 @@ class QuotesController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream do
-        flash.now[:notice] = "Quote was successfully destroyed."
+        flash.now[:notice] = "Le devis a été supprimé."
         render turbo_stream: [
           turbo_stream.remove(@quote),
           turbo_stream.update("toaster", partial: "shared/toaster")
         ]
       end
-      format.html { redirect_to quotes_path, notice: "Quote was successfully destroyed.", status: :see_other }
+      format.html { redirect_to quotes_path, notice: "Le devis a été supprimé.", status: :see_other }
     end
   end
 
   def publish
-    update_status(:published, "Quote was successfully published.")
+    update_status(:published, "Le devis a été publié.")
   end
 
   def archive
-    update_status(:archived, "Quote was successfully archived.")
+    update_status(:archived, "Le devis a été archivé.")
   end
 
   private
