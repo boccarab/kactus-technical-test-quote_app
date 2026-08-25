@@ -1,0 +1,61 @@
+<% content_for :title, @quote.name %>
+
+<main class="min-h-screen bg-white px-5 py-8 text-primary sm:px-8 lg:px-16 lg:py-7">
+  <div class="mx-auto w-full max-w-6xl">
+    <%= link_to quotes_path, class: "inline-flex items-center gap-3 rounded-md border border-primary px-7 py-3.5 font-semibold transition hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" do %>
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5m6-6-6 6 6 6"/>
+      </svg>
+      Quitter
+    <% end %>
+
+    <div class="mt-8 flex flex-wrap items-center gap-3 sm:mt-10">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl"><%= @quote.name %></h1>
+      <span class="rounded bg-[#D8F4AD] px-4 py-2 text-xl font-bold text-[#62A32A] sm:text-2xl">Validé</span>
+    </div>
+
+    <div class="mt-8 overflow-x-auto">
+      <div role="table" class="table w-full min-w-3xl table-fixed border-collapse text-left text-sm">
+        <div role="rowgroup" class="table-header-group bg-[#F8F4FF] text-[#8478A7]">
+          <div role="row" class="table-row">
+            <div role="columnheader" class="table-cell w-1/2 px-5 py-3 font-semibold">Article</div>
+            <div role="columnheader" class="table-cell w-20 px-3 py-3 font-semibold">Qté</div>
+            <div role="columnheader" class="table-cell w-28 px-3 py-3 font-semibold">PU HT</div>
+            <div role="columnheader" class="table-cell w-20 px-3 py-3 font-semibold">TVA</div>
+            <div role="columnheader" class="table-cell w-32 px-3 py-3 text-right font-semibold">Total TVA</div>
+            <div role="columnheader" class="table-cell w-32 px-5 py-3 text-right font-semibold">Total TTC</div>
+          </div>
+        </div>
+        <div role="rowgroup" class="table-row-group">
+          <% @quote.quote_items.each do |item| %>
+            <div role="row" class="table-row h-12">
+              <div role="cell" class="table-cell px-5 py-3 font-semibold"><%= item.name %></div>
+              <div role="cell" class="table-cell px-3 py-3"><%= item.quantity %></div>
+              <div role="cell" class="table-cell px-3 py-3"><%= number_to_currency(item.unit_price / 100.0, unit: "€", format: "%n %u", delimiter: " ", separator: ",") %></div>
+              <div role="cell" class="table-cell px-3 py-3"><%= number_to_percentage(item.vat, precision: 0) %></div>
+              <div role="cell" class="table-cell px-3 py-3 text-right font-semibold"><%= number_to_currency(item.total_vat / 100.0, unit: "€", format: "%n %u", delimiter: " ", separator: ",") %></div>
+              <div role="cell" class="table-cell px-5 py-3 text-right font-semibold"><%= number_to_currency(item.total_including_vat / 100.0, unit: "€", format: "%n %u", delimiter: " ", separator: ",") %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-7 flex justify-end">
+      <dl class="w-full max-w-xs rounded-md border border-[#EEEAF5] bg-white px-5 py-4 shadow-[0_2px_12px_rgba(32,21,66,0.12)]">
+        <div class="flex items-center justify-between gap-8">
+          <dt>Total HT</dt>
+          <dd class="font-semibold"><%= number_to_currency(@quote.total_excluding_vat / 100.0, unit: "€", format: "%n %u", delimiter: " ", separator: ",") %></dd>
+        </div>
+        <div class="mt-1 flex items-center justify-between gap-8 text-[#8478A7]">
+          <dt>Total TVA</dt>
+          <dd class="font-semibold"><%= number_to_currency(@quote.total_vat / 100.0, unit: "€", format: "%n %u", delimiter: " ", separator: ",") %></dd>
+        </div>
+        <div class="mt-1 flex items-center justify-between gap-8 font-bold">
+          <dt>Total TTC</dt>
+          <dd><%= number_to_currency(@quote.total_including_vat / 100.0, unit: "€", format: "%n %u", delimiter: " ", separator: ",") %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</main>

@@ -149,4 +149,15 @@ class QuoteTest < ActiveSupport::TestCase
       assert_equal quotes.size, quotes.map(&:identifier).uniq.size
     end
   end
+
+
+  test "calculates totals across its items" do
+    quote = Quote.create!(valid_attributes)
+    quote.quote_items.create!(name: "Conseil", quantity: 2, unit_price: 10_000, vat: 20)
+    quote.quote_items.create!(name: "Formation", quantity: 1, unit_price: 5_000, vat: 10)
+
+    assert_equal 25_000, quote.total_excluding_vat
+    assert_equal 4_500, quote.total_vat
+    assert_equal 29_500, quote.total_including_vat
+  end
 end

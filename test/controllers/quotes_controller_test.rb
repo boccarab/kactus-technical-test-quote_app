@@ -1,6 +1,31 @@
 require "test_helper"
 
 class QuotesControllerTest < ActionDispatch::IntegrationTest
+  test "shows a published quote in read-only mode with its items and totals" do
+    quote = Quote.create!(identifier: "DEV-SHOW", name: "Devis publié", status: :published)
+    quote.quote_items.create!(name: "Conseil", quantity: 2, unit_price: 10_000, vat: 20)
+
+    get quote_path(quote)
+
+    assert_response :success
+    assert_select "h1", "Devis publié"
+    assert_select "span", "Validé"
+    assert_select "a[href='#{quotes_path}']", text: /Quitter/
+    assert_select "div.table-row-group div.table-row", count: 1
+    assert_select "div.table-row-group", text: /Conseil/
+    assert_select "table", count: 0
+    assert_select "form", count: 0
+    assert_select "dl", text: /240,00 €/
+  end
+
+  test "does not show a quote that is not published" do
+    quote = Quote.create!(identifier: "DEV-DRAFT", name: "Brouillon", status: :draft)
+
+    get quote_path(quote)
+
+    assert_response :not_found
+  end
+
   test "lists draft and published quotes with the most recently edited first" do
     older_draft = Quote.create!(identifier: "DEV-001", name: "Ancien brouillon", status: :draft)
     published = Quote.create!(identifier: "DEV-002", name: "Devis publié", status: :published)
