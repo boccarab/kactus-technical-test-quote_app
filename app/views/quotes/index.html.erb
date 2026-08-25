@@ -28,7 +28,7 @@
                         <path d="M16.86 3.49a2.09 2.09 0 0 1 2.95 0l.7.7a2.09 2.09 0 0 1 0 2.95L8.18 19.47l-4.45.8.8-4.45L16.86 3.49Zm1.47 1.47L6.37 16.92l-.23 1.29 1.29-.23L19.39 6.02a.5.5 0 0 0 0-.71l-.35-.35a.5.5 0 0 0-.71 0Z"/>
                       </svg>
                     <% end %>
-                    <%= button_to quote_path(quote), method: :delete, class: "inline-flex size-9 items-center justify-center rounded-md border border-danger text-danger transition hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger", form: { data: { turbo_confirm: "Supprimer le devis #{quote.identifier} ?" } }, aria: { label: "Supprimer #{quote.identifier}" }, title: "Supprimer" do %>
+                    <%= button_to quote_path(quote), method: :delete, class: "inline-flex size-9 items-center justify-center rounded-md border border-danger text-danger transition hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger", form: { data: { controller: "confirmation", action: "submit->confirmation#confirm", confirmation_message_value: "Supprimer le devis #{quote.identifier} ?" } }, aria: { label: "Supprimer #{quote.identifier}" }, title: "Supprimer" do %>
                       <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/>
                       </svg>
