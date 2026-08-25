@@ -1,6 +1,8 @@
 class Quote < ApplicationRecord
     enum :status, %i[draft published archived].index_by(&:itself), prefix: true, default: :draft
 
+    has_many :quote_items, dependent: :destroy
+
     before_create :generate_identifier, if: -> { identifier.blank? }
     before_update :prevent_status_update, if: -> {
         will_save_change_to_status? && %w[published archived].include?(status_in_database)
