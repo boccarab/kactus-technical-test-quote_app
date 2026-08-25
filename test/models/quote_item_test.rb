@@ -52,15 +52,23 @@ class QuoteItemTest < ActiveSupport::TestCase
     assert_includes quote_item.errors[:quote], "must exist"
   end
 
-  test "price_vat_part returns the vat portion of the unit price" do
+  test "unit_price_vat returns the vat portion of the unit price" do
     quote_item = QuoteItem.new(valid_attributes.merge(unit_price: 1_234, vat: 20))
 
-    assert_equal 246, quote_item.price_vat_part
+    assert_equal 246, quote_item.unit_price_vat
   end
 
-  test "price_with_vat returns the unit price including vat" do
+  test "unit_price_including_vat returns the unit price including vat" do
     quote_item = QuoteItem.new(valid_attributes.merge(unit_price: 1_234, vat: 20))
 
-    assert_equal 1_480, quote_item.price_with_vat
+    assert_equal 1_480, quote_item.unit_price_including_vat
+  end
+
+  test "calculates line totals using the quantity" do
+    quote_item = QuoteItem.new(valid_attributes.merge(quantity: 3, unit_price: 1_000, vat: 20))
+
+    assert_equal 3_000, quote_item.total_excluding_vat
+    assert_equal 600, quote_item.total_vat
+    assert_equal 3_600, quote_item.total_including_vat
   end
 end
