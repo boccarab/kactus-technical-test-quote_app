@@ -2,6 +2,7 @@ class Quote < ApplicationRecord
     enum :status, %i[draft published archived].index_by(&:itself), prefix: true, default: :draft
 
     has_many :quote_items, dependent: :destroy
+    accepts_nested_attributes_for :quote_items, allow_destroy: true
 
     before_create :generate_identifier, if: -> { identifier.blank? }
     before_update :prevent_status_update, if: -> {

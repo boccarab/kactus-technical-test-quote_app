@@ -1,6 +1,47 @@
 require "test_helper"
 
 class QuotesControllerTest < ActionDispatch::IntegrationTest
+  test "renders the same editor for new and edit routes" do
+    quote = Quote.create!(identifier: "DEV-EDIT", name: "À modifier")
+    quote.quote_items.create!(name: "Article", quantity: 1, unit_price: 1_000, vat: 20)
+
+    get new_quote_path
+    assert_response :success
+    assert_select "form[data-controller='quote-editor']"
+    assert_select "span", "En cours d’édition"
+    assert_select "div.table[role='table']", count: 1
+    assert_select "template[data-quote-editor-target='rowTemplate']", count: 1
+    assert_select "div.table-row[data-quote-editor-target='editor']:not(.hidden)", count: 1
+    assert_select "table", count: 0
+
+    get edit_quote_path(quote)
+    assert_response :success
+    assert_select "input[name='quote[name]'][value='À modifier']"
+    assert_select "button", text: /Enregistrer et quitter/
+    assert_select "div[data-quote-editor-target='editor'].hidden", count: 1
+  end
+
+  test "creates a quote and its items in one request then returns to the listing" do
+    assert_difference([ "Quote.count", "QuoteItem.count" ], 1) do
+      post quotes_path, params: { quote: { name: "Nouveau devis", quote_items_attributes: { "0" => { name: "Conseil", quantity: 2, unit_price: 10_000, vat: 5.5 } } } }
+    end
+
+    assert_redirected_to quotes_path
+    assert_equal "Conseil", Quote.last.quote_items.first.name
+    assert_equal 5.5, Quote.last.quote_items.first.vat
+  end
+
+  test "updates and removes items only when the quote is submitted" do
+    quote = Quote.create!(identifier: "DEV-UPDATE", name: "Avant")
+    removed_item = quote.quote_items.create!(name: "Ancien", quantity: 1, unit_price: 1_000, vat: 20)
+
+    patch quote_path(quote), params: { quote: { name: "Après", quote_items_attributes: { "0" => { id: removed_item.id, _destroy: "1" }, "1" => { name: "Nouveau", quantity: 3, unit_price: 2_000, vat: 10 } } } }
+
+    assert_redirected_to quotes_path
+    assert_equal "Après", quote.reload.name
+    assert_equal [ "Nouveau" ], quote.quote_items.pluck(:name)
+  end
+
   test "shows a published quote in read-only mode with its items and totals" do
     quote = Quote.create!(identifier: "DEV-SHOW", name: "Devis publié", status: :published)
     quote.quote_items.create!(name: "Conseil", quantity: 2, unit_price: 10_000, vat: 20)
