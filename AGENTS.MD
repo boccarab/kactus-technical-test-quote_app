@@ -35,3 +35,9 @@ Main colors:
 - Danger: #F3682B
 
 Use tailwind's table utilities https://tailwindcss.com/docs/display#table instead of <table> html tags 
+
+### Notifications
+
+- Every action that returns a `notice` or `alert` must display it through the global toaster.
+- For redirects, set the flash using `notice:` or `alert:` so the application layout renders it.
+- For Turbo Stream responses without a redirect, set `flash.now[:notice]` or `flash.now[:alert]` and include `turbo_stream.update("toaster", partial: "shared/toaster")` in the response.

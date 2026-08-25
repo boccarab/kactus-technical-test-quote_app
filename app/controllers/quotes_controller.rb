@@ -38,7 +38,13 @@ class QuotesController < ApplicationController
     @quote.destroy!
 
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove(@quote) }
+      format.turbo_stream do
+        flash.now[:notice] = "Quote was successfully destroyed."
+        render turbo_stream: [
+          turbo_stream.remove(@quote),
+          turbo_stream.update("toaster", partial: "shared/toaster")
+        ]
+      end
       format.html { redirect_to quotes_path, notice: "Quote was successfully destroyed.", status: :see_other }
     end
   end
